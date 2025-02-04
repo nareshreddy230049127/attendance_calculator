@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .detained {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .condoned {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .eligible {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Attendance Calculator</h1>
+    <div class="container">
+        <label for="totalClasses">Total Number of Classes:</label>
+        <input type="number" id="totalClasses" placeholder="Enter total classes" required>
+
+        <label for="attendedClasses">Attended Classes:</label>
+        <input type="number" id="attendedClasses" placeholder="Enter attended classes" required>
+
+        <button onclick="calculateAttendance()">Calculate Attendance</button>
+
+        <div class="result" id="result" style="display: none;">
+            <p id="attendancePercentage"></p>
+            <p id="attendanceStatus"></p>
+            <p id="classesNeeded"></p>
+        </div>
+    </div>
+
+    <script>
+        function calculateAttendance() {
+            var totalClasses = parseInt(document.getElementById('totalClasses').value);
+            var attendedClasses = parseInt(document.getElementById('attendedClasses').value);
+
+            if (isNaN(totalClasses) || isNaN(attendedClasses) || totalClasses <= 0 || attendedClasses < 0) {
+                alert("Please enter valid numbers.");
+                return;
+            }
+
+            if (attendedClasses > totalClasses) {
+                alert("Attended classes cannot be greater than total classes.");
+                return;
+            }
+
+            var percentage = (attendedClasses / totalClasses) * 100;
+            var status = "";
+            var classesNeeded85 = 0, classesNeeded75 = 0;
+
+            // Predict how many more classes are needed to reach 85% attendance
+            classesNeeded85 = Math.ceil((0.85 * totalClasses - attendedClasses) / 0.15);
+            classesNeeded75 = Math.ceil((0.75 * totalClasses - attendedClasses) / 0.25);
+
+            // Ensure valid values
+            if (classesNeeded85 < 0) classesNeeded85 = 0;
+            if (classesNeeded75 < 0) classesNeeded75 = 0;
+
+            var classesMessage = "";
+
+            // Determine the status based on percentage
+            if (percentage >= 85) {
+                status = "You are eligible!";
+                document.getElementById('result').className = "result eligible";
+            } else if (percentage >= 75) {
+                status = "You are in the condonation region. Attend more classes to reach 85%.";
+                document.getElementById('result').className = "result condoned";
+                classesMessage = "To reach 85%, attend at least " + classesNeeded85 + " more classes.";
+            } else {
+                status = "You are detained due to low attendance.";
+                document.getElementById('result').className = "result detained";
+                classesMessage = "To reach 75% (condonation), attend at least " + classesNeeded75 + " more classes. \nTo reach 85% (eligibility), attend at least " + classesNeeded85 + " more classes.";
+            }
+
+            document.getElementById('attendancePercentage').innerText = "Attendance: " + percentage.toFixed(2) + "%";
+            document.getElementById('attendanceStatus').innerText = status;
+            document.getElementById('classesNeeded').innerText = classesMessage;
+
+            document.getElementById('result').style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
